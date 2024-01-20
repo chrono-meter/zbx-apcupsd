@@ -26,7 +26,6 @@ Triggers:
 - 3/4/5 years gone after battery replacement
 
 User Macros:
-- {$APC_NOM_WATTS} - Nominal watts pulled from apcaccess, user filled in, defaults to 650
 - {$APC_REM_WARN} - Time remaining on battery warning value, defaults to 10 minutes
 - {$APC_REM_CRIT} - Time remaining on battery critical value, defaults to 3 minutes
 
@@ -37,6 +36,6 @@ Instructions:
 4. `sudo wget https://github.com/chrono-meter/zbx-apcupsd/raw/main/userparameter_apcupsd.conf -O /etc/zabbix/zabbix_agent2.d/userparameter_apcupsd.conf`
 5. `sudo systemctl restart zabbix-agent2.service`
 6. Test by `zabbix_get -s 127.0.0.1 -p 10050 -k "apcupsd.apcaccess"`
-7. Import the template XML
+7. Import the template XML.
 8. Assign the template to your host.
 9. Make sure macros are at values that work for you.
