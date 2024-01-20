@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>5.0</version>
-    <date>2021-04-28T16:02:57Z</date>
+    <version>6.0</version>
+    <date>2024-01-20T11:36:51Z</date>
     <groups>
         <group>
+            <uuid>7df96b18c230490a9a0a9e2307226338</uuid>
             <name>Templates</name>
         </group>
     </groups>
     <templates>
         <template>
+            <uuid>af251381b1fc47e884c723bf15a00530</uuid>
             <template>APCUPSd</template>
             <name>APCUPSd</name>
             <description>Template for reading APC UPS over USB interface using apcupsd.</description>
@@ -17,155 +19,465 @@
                     <name>Templates</name>
                 </group>
             </groups>
-            <applications>
-                <application>
-                    <name>UPS</name>
-                </application>
-            </applications>
             <items>
                 <item>
+                    <uuid>5507ddcd0bff4e4bb5e7a871fe5e18f7</uuid>
+                    <name>apcaccess.json</name>
+                    <type>ZABBIX_ACTIVE</type>
+                    <key>apcupsd.apcaccess</key>
+                    <delay>5m</delay>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                </item>
+                <item>
+                    <uuid>8fad9bbf9d6843079b0faa752225d54b</uuid>
+                    <name>UPS Battery Replacement Date</name>
+                    <type>DEPENDENT</type>
+                    <key>apcupsd.BATTDATE</key>
+                    <delay>0</delay>
+                    <history>7d</history>
+                    <trends>0</trends>
+                    <units>unixtime</units>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.BATTDATE</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>JAVASCRIPT</type>
+                            <parameters>
+                                <parameter>return new Date(value).getTime() / 1000;</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>apcupsd.apcaccess</key>
+                    </master_item>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>UPS</value>
+                        </tag>
+                    </tags>
+                    <triggers>
+                        <trigger>
+                            <uuid>f7dbc88416be4441819a32e11fa1d3f2</uuid>
+                            <expression>last(/APCUPSd/apcupsd.BATTDATE) &lt; now() - (3 * 365 * 24 * 60 * 60)</expression>
+                            <name>3 years gone after battery replacement</name>
+                            <priority>WARNING</priority>
+                        </trigger>
+                        <trigger>
+                            <uuid>53c9549567fe4c459589474e589e6026</uuid>
+                            <expression>last(/APCUPSd/apcupsd.BATTDATE) &lt; now() - (4 * 365 * 24 * 60 * 60)</expression>
+                            <name>4 years gone after battery replacement</name>
+                            <priority>AVERAGE</priority>
+                        </trigger>
+                        <trigger>
+                            <uuid>f6711e1466ba4a9ca4392a8ba807efab</uuid>
+                            <expression>last(/APCUPSd/apcupsd.BATTDATE) &lt; now() - (5 * 365 * 24 * 60 * 60)</expression>
+                            <name>5 years gone after battery replacement</name>
+                            <priority>HIGH</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <uuid>b794f5bdba344543b2e7e681d50455ea</uuid>
                     <name>UPS Battery Voltage</name>
+                    <type>DEPENDENT</type>
                     <key>apcupsd.BATTV</key>
-                    <delay>10s</delay>
+                    <delay>0</delay>
                     <history>30d</history>
+                    <trends>90d</trends>
                     <value_type>FLOAT</value_type>
-                    <applications>
-                        <application>
-                            <name>UPS</name>
-                        </application>
-                    </applications>
+                    <units>V</units>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.BATTV</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <parameters>
+                                <parameter> Volts</parameter>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>apcupsd.apcaccess</key>
+                    </master_item>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>UPS</value>
+                        </tag>
+                    </tags>
                 </item>
                 <item>
+                    <uuid>1a66aa1cc9804945b31db89ab6b6813d</uuid>
                     <name>UPS Battery Charge</name>
+                    <type>DEPENDENT</type>
                     <key>apcupsd.BCHARGE</key>
-                    <delay>10s</delay>
+                    <delay>0</delay>
                     <history>30d</history>
+                    <trends>90d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <applications>
-                        <application>
-                            <name>UPS</name>
-                        </application>
-                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.BCHARGE</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <parameters>
+                                <parameter> Percent</parameter>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>apcupsd.apcaccess</key>
+                    </master_item>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>UPS</value>
+                        </tag>
+                    </tags>
                 </item>
                 <item>
+                    <uuid>5b723ff2fc634a0ab86f0b55f0133d4d</uuid>
                     <name>UPS High-Voltage Transfer</name>
+                    <type>DEPENDENT</type>
                     <key>apcupsd.HITRANS</key>
-                    <delay>24h</delay>
+                    <delay>0</delay>
                     <history>30d</history>
+                    <trends>90d</trends>
                     <value_type>FLOAT</value_type>
                     <units>V</units>
-                    <applications>
-                        <application>
-                            <name>UPS</name>
-                        </application>
-                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.HITRANS</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <parameters>
+                                <parameter> Volts</parameter>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>apcupsd.apcaccess</key>
+                    </master_item>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>UPS</value>
+                        </tag>
+                    </tags>
                 </item>
                 <item>
+                    <uuid>20ff8be0b5c8470799778b26139836d6</uuid>
                     <name>UPS Line Voltage</name>
+                    <type>DEPENDENT</type>
                     <key>apcupsd.LINEV</key>
-                    <delay>10s</delay>
+                    <delay>0</delay>
                     <history>30d</history>
+                    <trends>90d</trends>
                     <value_type>FLOAT</value_type>
                     <units>V</units>
-                    <applications>
-                        <application>
-                            <name>UPS</name>
-                        </application>
-                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.LINEV</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <parameters>
+                                <parameter> Volts</parameter>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>apcupsd.apcaccess</key>
+                    </master_item>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>UPS</value>
+                        </tag>
+                    </tags>
                 </item>
                 <item>
+                    <uuid>51358dd1a867490eba18c33ab64c8b42</uuid>
                     <name>UPS Load</name>
+                    <type>DEPENDENT</type>
                     <key>apcupsd.LOADPCT</key>
-                    <delay>10s</delay>
+                    <delay>0</delay>
                     <history>30d</history>
+                    <trends>90d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
-                    <applications>
-                        <application>
-                            <name>UPS</name>
-                        </application>
-                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.LOADPCT</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <parameters>
+                                <parameter> Percent</parameter>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>apcupsd.apcaccess</key>
+                    </master_item>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>UPS</value>
+                        </tag>
+                    </tags>
                 </item>
                 <item>
+                    <uuid>d16db749542f48cabe66de6b338f8eef</uuid>
                     <name>UPS Low-Voltage Transfer</name>
+                    <type>DEPENDENT</type>
                     <key>apcupsd.LOTRANS</key>
-                    <delay>24h</delay>
+                    <delay>0</delay>
                     <history>30d</history>
+                    <trends>90d</trends>
                     <value_type>FLOAT</value_type>
                     <units>V</units>
-                    <applications>
-                        <application>
-                            <name>UPS</name>
-                        </application>
-                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.LOTRANS</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <parameters>
+                                <parameter> Volts</parameter>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>apcupsd.apcaccess</key>
+                    </master_item>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>UPS</value>
+                        </tag>
+                    </tags>
                 </item>
                 <item>
+                    <uuid>c95a44749bc846408107ed86b13b3a58</uuid>
                     <name>UPS Minimum Battery Charge</name>
+                    <type>DEPENDENT</type>
                     <key>apcupsd.MBATTCHG</key>
-                    <delay>24h</delay>
+                    <delay>0</delay>
                     <history>30d</history>
+                    <trends>90d</trends>
                     <units>%</units>
-                    <applications>
-                        <application>
-                            <name>UPS</name>
-                        </application>
-                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.MBATTCHG</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <parameters>
+                                <parameter> Percent</parameter>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>apcupsd.apcaccess</key>
+                    </master_item>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>UPS</value>
+                        </tag>
+                    </tags>
                 </item>
                 <item>
+                    <uuid>fa9cf2371e72476f958ef2dd3542ac06</uuid>
                     <name>UPS Minimum Time on Battery Remaining</name>
+                    <type>DEPENDENT</type>
                     <key>apcupsd.MINTIMEL</key>
-                    <delay>24h</delay>
+                    <delay>0</delay>
                     <history>30d</history>
+                    <trends>90d</trends>
                     <units>m</units>
-                    <applications>
-                        <application>
-                            <name>UPS</name>
-                        </application>
-                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.MINTIMEL</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <parameters>
+                                <parameter> Minutes</parameter>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>apcupsd.apcaccess</key>
+                    </master_item>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>UPS</value>
+                        </tag>
+                    </tags>
                 </item>
                 <item>
+                    <uuid>1711f47022c24908badb61d02c8fe1c4</uuid>
+                    <name>UPS Model</name>
+                    <type>DEPENDENT</type>
+                    <key>apcupsd.MODEL</key>
+                    <delay>0</delay>
+                    <history>7d</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.MODEL</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>apcupsd.apcaccess</key>
+                    </master_item>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>UPS</value>
+                        </tag>
+                    </tags>
+                </item>
+                <item>
+                    <uuid>c182be711c5d43188993fc288442644c</uuid>
                     <name>UPS Watts Load</name>
                     <type>CALCULATED</type>
                     <key>apcupsd.nomwatts</key>
+                    <delay>5m</delay>
+                    <history>30d</history>
+                    <trends>90d</trends>
                     <units>w</units>
-                    <params>last(apcupsd.LOADPCT) / 100 * {$APC_NOM_WATTS}</params>
-                    <applications>
-                        <application>
-                            <name>UPS</name>
-                        </application>
-                    </applications>
+                    <params>last(//apcupsd.LOADPCT) / 100 * {$APC_NOM_WATTS}</params>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>UPS</value>
+                        </tag>
+                    </tags>
                 </item>
                 <item>
+                    <uuid>0f70a833955b4f84a5fb889752c73353</uuid>
+                    <name>UPS Serial Number</name>
+                    <type>DEPENDENT</type>
+                    <key>apcupsd.SERIALNO</key>
+                    <delay>0</delay>
+                    <history>7d</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.SERIALNO</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>apcupsd.apcaccess</key>
+                    </master_item>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>UPS</value>
+                        </tag>
+                    </tags>
+                </item>
+                <item>
+                    <uuid>d1f08efb853848ea84d421c822e6df83</uuid>
                     <name>UPS Status</name>
+                    <type>DEPENDENT</type>
                     <key>apcupsd.Status</key>
-                    <delay>30s</delay>
+                    <delay>0</delay>
                     <history>30d</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
-                    <applications>
-                        <application>
-                            <name>UPS</name>
-                        </application>
-                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.STATUS</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>apcupsd.apcaccess</key>
+                    </master_item>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>UPS</value>
+                        </tag>
+                    </tags>
                     <triggers>
                         <trigger>
-                            <expression>{regexp(&quot;^(ONLINE)$&quot;,#1)}=0</expression>
+                            <uuid>b58f4b7c5dc941a4bc7e3b07fa57c30d</uuid>
+                            <expression>find(/APCUPSd/apcupsd.Status,#1,&quot;regexp&quot;,&quot;^(ONLINE)$&quot;)=0</expression>
                             <name>UPS Power Interruption</name>
                             <priority>AVERAGE</priority>
                             <dependencies>
                                 <dependency>
                                     <name>UPS Recharging</name>
-                                    <expression>{APCUPSd:apcupsd.Status.regexp(&quot;^(CHARGING)$&quot;,1)}=1</expression>
+                                    <expression>find(/APCUPSd/apcupsd.Status,1s,&quot;regexp&quot;,&quot;^(CHARGING)$&quot;)=1</expression>
                                 </dependency>
                                 <dependency>
                                     <name>UPS Time Remaining Very Low</name>
-                                    <expression>{APCUPSd:apcupsd.TIMELEFT.last()}&lt;{$APC_REM_CRIT}</expression>
+                                    <expression>last(/APCUPSd/apcupsd.TIMELEFT)&lt;{$APC_REM_CRIT}</expression>
                                 </dependency>
                             </dependencies>
                         </trigger>
                         <trigger>
-                            <expression>{regexp(&quot;^(CHARGING)$&quot;,1)}=1</expression>
+                            <uuid>5da72f304a434131a6fa5e899d69b401</uuid>
+                            <expression>find(/APCUPSd/apcupsd.Status,1s,&quot;regexp&quot;,&quot;^(CHARGING)$&quot;)=1</expression>
                             <name>UPS Recharging</name>
                             <priority>INFO</priority>
                             <manual_close>YES</manual_close>
@@ -173,55 +485,111 @@
                     </triggers>
                 </item>
                 <item>
+                    <uuid>4e58fbf6a9a8439aa451b05cc2ed9032</uuid>
                     <name>UPS Time Left on Battery</name>
+                    <type>DEPENDENT</type>
                     <key>apcupsd.TIMELEFT</key>
-                    <delay>10s</delay>
+                    <delay>0</delay>
                     <history>30d</history>
+                    <trends>90d</trends>
                     <value_type>FLOAT</value_type>
                     <units>m</units>
-                    <applications>
-                        <application>
-                            <name>UPS</name>
-                        </application>
-                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.TIMELEFT</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <parameters>
+                                <parameter> Minutes</parameter>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>apcupsd.apcaccess</key>
+                    </master_item>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>UPS</value>
+                        </tag>
+                    </tags>
                     <triggers>
                         <trigger>
-                            <expression>{last()}&lt;{$APC_REM_WARN}</expression>
+                            <uuid>5826c2e117b74ab99c01885027b1bcf5</uuid>
+                            <expression>last(/APCUPSd/apcupsd.TIMELEFT)&lt;{$APC_REM_WARN}</expression>
                             <name>UPS Time Remaining Low</name>
                             <priority>HIGH</priority>
                             <dependencies>
                                 <dependency>
                                     <name>UPS Recharging</name>
-                                    <expression>{APCUPSd:apcupsd.Status.regexp(&quot;^(CHARGING)$&quot;,1)}=1</expression>
+                                    <expression>find(/APCUPSd/apcupsd.Status,1s,&quot;regexp&quot;,&quot;^(CHARGING)$&quot;)=1</expression>
                                 </dependency>
                             </dependencies>
                         </trigger>
                         <trigger>
-                            <expression>{last()}&lt;{$APC_REM_CRIT}</expression>
+                            <uuid>3c619bbd6f2e4dca8ec6cdc872d94b7f</uuid>
+                            <expression>last(/APCUPSd/apcupsd.TIMELEFT)&lt;{$APC_REM_CRIT}</expression>
                             <name>UPS Time Remaining Very Low</name>
                             <priority>DISASTER</priority>
                             <dependencies>
                                 <dependency>
                                     <name>UPS Recharging</name>
-                                    <expression>{APCUPSd:apcupsd.Status.regexp(&quot;^(CHARGING)$&quot;,1)}=1</expression>
+                                    <expression>find(/APCUPSd/apcupsd.Status,1s,&quot;regexp&quot;,&quot;^(CHARGING)$&quot;)=1</expression>
                                 </dependency>
                             </dependencies>
                         </trigger>
                     </triggers>
                 </item>
                 <item>
+                    <uuid>0dd99ddc7ed34320871d3940eb7bcee8</uuid>
                     <name>UPS Time on Battery</name>
+                    <type>DEPENDENT</type>
                     <key>apcupsd.TONBATT</key>
-                    <delay>10s</delay>
+                    <delay>0</delay>
                     <history>30d</history>
+                    <trends>90d</trends>
                     <units>s</units>
-                    <applications>
-                        <application>
-                            <name>UPS</name>
-                        </application>
-                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.TONBATT</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <parameters>
+                                <parameter> Seconds</parameter>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>apcupsd.apcaccess</key>
+                    </master_item>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>UPS</value>
+                        </tag>
+                    </tags>
                 </item>
             </items>
+            <tags>
+                <tag>
+                    <tag>class</tag>
+                    <value>power</value>
+                </tag>
+                <tag>
+                    <tag>target</tag>
+                    <value>apc</value>
+                </tag>
+            </tags>
             <macros>
                 <macro>
                     <macro>{$APC_NOM_WATTS}</macro>
@@ -243,6 +611,7 @@
     </templates>
     <graphs>
         <graph>
+            <uuid>30fa5286885744b6b5af18682928313a</uuid>
             <name>Line Voltage</name>
             <graph_items>
                 <graph_item>
