@@ -14,12 +14,16 @@ Data collected:
 - UPS State (status)
 - Time Left on Battery (m)
 - Current Load (W) (this value is imprecise, as it is calculated based off of the Load % and the nominal power rating (pulled from apcaccess and used as a macro))
+- Model name
+- Serial Number
+- Battery Replacement Date
 
 Triggers:
 - Power interruption - Operating on battery
 - UPS Recharging - Battery is charging
 - Time Remaining Low - Macro specified threshold for alerting on a low battery
 - Time Remaining Very Low - Macro specified threshold for alerting on a critically low battery
+- 3/4/5 years gone after battery replacement
 
 User Macros:
 - {$APC_NOM_WATTS} - Nominal watts pulled from apcaccess, user filled in, defaults to 650
@@ -28,9 +32,11 @@ User Macros:
 
 Instructions:
 1. Install `apcupsd` using your package manager.
-2. Verify that the UPS is accessible by running `apcaccess` and make sure that you see the values you expect.
-3. Copy the userparameter file to your `/etc/zabbix_agent{d,2}.d/` directory, or wherever your Zabbix Agent user parameter files live.
-4. Restart your Zabbix Agent.
-5. Import the template XML
-6. Assign the template to your host.
-7. Make sure macros are at values that work for you.
+2. `sudo wget https://github.com/chrono-meter/zbx-apcupsd/raw/main/apcaccess-json.py -O /etc/zabbix/zabbix_agent2.d/apcaccess-json.py`
+3. `sudo chmod +x /etc/zabbix/zabbix_agent2.d/apcaccess-json.py`
+4. `sudo wget https://github.com/chrono-meter/zbx-apcupsd/raw/main/userparameter_apcupsd.conf -O /etc/zabbix/zabbix_agent2.d/userparameter_apcupsd.conf`
+5. `sudo systemctl restart zabbix-agent2.service`
+6. Test by `zabbix_get -s 127.0.0.1 -p 10050 -k "apcupsd.apcaccess"`
+7. Import the template XML
+8. Assign the template to your host.
+9. Make sure macros are at values that work for you.
