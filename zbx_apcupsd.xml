@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>6.0</version>
-    <date>2024-01-20T11:36:51Z</date>
+    <date>2024-01-20T21:47:07Z</date>
     <groups>
         <group>
             <uuid>7df96b18c230490a9a0a9e2307226338</uuid>
@@ -389,6 +389,40 @@
                     </tags>
                 </item>
                 <item>
+                    <uuid>0a7e3ca931dd40a593655877c41f9fce</uuid>
+                    <name>UPS Nominal Power</name>
+                    <type>DEPENDENT</type>
+                    <key>apcupsd.NOMPOWER</key>
+                    <delay>0</delay>
+                    <history>30d</history>
+                    <trends>90d</trends>
+                    <units>W</units>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.NOMPOWER</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <parameters>
+                                <parameter> Watts</parameter>
+                                <parameter/>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>apcupsd.apcaccess</key>
+                    </master_item>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>UPS</value>
+                        </tag>
+                    </tags>
+                </item>
+                <item>
                     <uuid>c182be711c5d43188993fc288442644c</uuid>
                     <name>UPS Watts Load</name>
                     <type>CALCULATED</type>
@@ -396,8 +430,9 @@
                     <delay>5m</delay>
                     <history>30d</history>
                     <trends>90d</trends>
-                    <units>w</units>
-                    <params>last(//apcupsd.LOADPCT) / 100 * {$APC_NOM_WATTS}</params>
+                    <value_type>FLOAT</value_type>
+                    <units>W</units>
+                    <params>last(//apcupsd.LOADPCT) / 100 * last(//apcupsd.NOMPOWER)</params>
                     <tags>
                         <tag>
                             <tag>Application</tag>
@@ -591,11 +626,6 @@
                 </tag>
             </tags>
             <macros>
-                <macro>
-                    <macro>{$APC_NOM_WATTS}</macro>
-                    <value>650</value>
-                    <description>nominal wattage of UPS, pulled from running apcaccess and using value of watts for NOMPOWER</description>
-                </macro>
                 <macro>
                     <macro>{$APC_REM_CRIT}</macro>
                     <value>3</value>
